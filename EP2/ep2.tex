@@ -1,0 +1,272 @@
+% vim: spl=pt
+\documentclass[portuguese,minted]{artigo}
+\usepackage{booktabs}
+\usepackage{circuitikz}
+
+\setminted{
+    frame=lines,
+    framesep=2mm, 
+    baselinestretch=1.2,
+    fontsize=\footnotesize,
+    linenos
+}
+
+\author{Louis Bergamo Radial\\8992822}
+\title{MAP0214 - Cálculo Numérico Aplicado à Física\\Exercício Programa II - Solução de Sistemas de Equações Lineares}
+\begin{document}
+\maketitle
+
+Consideramos o circuito 
+\begin{center}
+    \begin{circuitikz}[scale=0.7,every node/.style={scale=0.9},american voltages]
+        % \draw[help lines] (0,0) grid (12,6);
+        \draw
+        (0,0) to [V=\(U_1\), invert] (0, 6)
+        to [R=\(R_1\), f_=\(i_1\)] (6,6)
+        to [short, *-] (6,6)
+        to [R=\(R_3\), f_=\(i_2\)] (12,6)
+        to [V=\(U_3\)] (12, 0)
+        to [short, -*] (6,0)
+        to [R=\(R_2\)] (0,0);
+        \draw
+        (6,6) to [R=\(R_4\), f_=\(i_3\)] (6,3)
+        to [V=\(U_2\)] (6,0);
+    \end{circuitikz}
+\end{center}
+com \(R_1 = \SI{4.7}{\ohm},\) \(R_2 = \SI{7.2}{\ohm},\) \(R_3 = \SI{5.3}{\ohm},\) \(R_4 = \SI{1.9}{\ohm},\) \(U_1 = \SI{24.1}{\volt},\) \(U_2 = \SI{8.9}{\volt},\) e \(U_3 = \SI{5.8}{\volt}.\) Na malha com \(U_2\) e \(U_3\) temos
+\begin{equation*}
+    - R_4 i_3 - U_2 + U_3 + R_3 i_2 = 0,
+\end{equation*}
+na malha com \(U_1\) e \(U_2\) temos
+\begin{equation*}
+    U_1 - R_1 i_1 - R_4 i_3 - U_2 - R_2 i_1 = 0,
+\end{equation*}
+e pelo nó temos
+\begin{equation*}
+    i_1 = i_2 + i_3,
+\end{equation*}
+portanto temos o sistema de equações lineares
+\begin{equation*}
+    \begin{cases}
+        R_3 i_2 - R_4 i_3 = U_2 - U_3\\
+        (R_1 + R_2) i_1 + R_4 i_3 = U_1 - U_2\\
+        i_1 - i_2 - i_3 = 0
+    \end{cases}
+    \iff
+    \begin{pmatrix}
+        0 && R_3 && - R_4\\
+        R_1 + R_2 && 0 && R_4\\
+        1 && -1 && -1
+    \end{pmatrix}
+    \begin{pmatrix}
+        i_1 \\ i_2 \\ i_3
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        U_2 - U_3\\
+        U_1 - U_2\\
+        0
+    \end{pmatrix}.
+\end{equation*}
+Assim, substituindo os valores,
+\begin{equation*}
+    \begin{pmatrix}
+        0 && 5.3 && - 1.9\\
+        11.9 && 0 && 1.9\\
+        1 && -1 && -1
+    \end{pmatrix}
+    \begin{pmatrix}
+        i_1 \\ i_2 \\ i_3
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        3.1\\
+        15.2\\
+        0
+    \end{pmatrix}
+\end{equation*}
+é o sistema de equações lineares que utilizaremos para testar os métodos numéricos.
+
+Para os métodos numéricos, a linguagem C foi utilizada com o compilador \verb|gcc|, enquanto que o raio espectral para a estimativa do número de iterações do método de Jacobi foi determinado com o Mathematica. As condições de parada implementadas para os métodos iterativos foram baseadas na comparação da diferença absoluta \(\max\setc{\abs{x^{k+1}_i - x^k_i}}{i}\) entre iterações com uma precisão dada \(\varepsilon = 10^{-3},\) desde que o o número de iterações não passe do limite definido pela constante \verb|MAX_ITERATIONS|, igual a cem iterações.
+
+\section{Método da Eliminação de Gauss}
+O método de Eliminação de Gauss foi implementado com as funções abaixo, usando o pivotamento parcial.
+\inputminted[firstline=9,lastline=63]{c}{src/main.c}
+
+O programa recebe a matriz do sistema dada por
+\begin{equation*}
+    \begin{pmatrix}
+        +0.00000&&+5.30000&&-1.90000&&+3.10000\\
+        +11.90000&&+0.00000&&+1.90000&&+15.20000\\
+        +1.00000&&-1.00000&&-1.00000&&+0.00000
+    \end{pmatrix}.
+\end{equation*}
+Após o pivotamento para a primeira fileira, a matriz aumentada corresponde a 
+\begin{equation*}
+    \begin{pmatrix}
+        +11.90000&&+0.00000&&+1.90000&&+15.20000\\
+        +0.00000&&+5.30000&&-1.90000&&+3.10000\\
+        +1.00000&&-1.00000&&-1.00000&&+0.00000
+    \end{pmatrix}
+\end{equation*}
+e então após eliminar para frente nesta fileira, produz a matriz
+\begin{equation*}
+    \begin{pmatrix}
+        +11.90000&&+0.00000&&+1.90000&&+15.20000\\
+        +0.00000&&+5.30000&&-1.90000&&+3.10000\\
+        +0.00000&&-1.00000&&-1.15966&&-1.27731
+    \end{pmatrix}.
+\end{equation*}
+O pivotamento para segunda fileira não altera a matriz, e então após a eliminação para a frente temos a matriz escalonada
+\begin{equation*}
+    \begin{pmatrix}
+        +11.90000&&+0.00000&&+1.90000&&+15.20000\\
+        +0.00000&&+5.30000&&-1.90000&&+3.10000\\
+        +0.00000&&+0.00000&&-1.51815&&-0.69241
+    \end{pmatrix},
+\end{equation*}
+já que o pivotamento para a terceira fileira não altera nada. A seguir, o programa executa a substituição para trás, resultando na matriz
+\begin{equation*}
+    \begin{pmatrix}
+        +1.00000&&+0.00000&&+0.00000&&+1.20449\\
+        +0.00000&&+1.00000&&+0.00000&&+0.74841\\
+        -0.00000&&-0.00000&&+1.00000&&+0.45608
+    \end{pmatrix},
+\end{equation*}
+isto é, temos a solução
+\begin{equation*}
+    \begin{cases}
+        i_1 \approx \SI{1.20449}{\ampere}\\
+        i_2 \approx \SI{0.74841}{\ampere}\\
+        i_3 \approx \SI{0.45608}{\ampere}
+    \end{cases}
+\end{equation*}
+para as correntes do circuito.
+
+\section{Método de Jacobi}
+O método de Jacobi foi implementado com a função abaixo.
+\inputminted[firstline=65,lastline=107]{c}{src/main.c}
+
+O programa recebe a matriz do sistema dada por
+\begin{equation*}
+    A = \begin{pmatrix}
+        +11.90000&&+0.00000&&+1.90000&&+15.20000\\
+        +0.00000&&+5.30000&&-1.90000&&+3.10000\\
+        +1.00000&&-1.00000&&-1.00000&&+0.00000
+    \end{pmatrix}
+\end{equation*}
+e tem sua saída apresentada na \cref{tab:jacobi}, obtendo as estimativas para a solução
+\begin{equation*}
+    \begin{cases}
+        i_1 \approx \SI{1.204}{\ampere}\\
+        i_2 \approx \SI{0.748}{\ampere}\\
+        i_3 \approx \SI{0.456}{\ampere}
+    \end{cases}
+\end{equation*}
+após vinte iterações.
+\begin{table}[H]
+    \centering
+    \caption{Saída para o método de Jacobi}
+    \begin{tabular}{c c c c c}
+        \toprule
+        \(k\) & \(i^{(k)}_1\) & \(i^{(k)}_2\) & \(i^{(k)}_3\) & \(\max{\abs*{i^{(k+1)}_{j} - i^{(k)}_j}}\)\\
+        \midrule
+        0&+1.00000&+1.00000&+1.00000&1.00000\\
+        1&+1.11765&+0.94340&-0.00000&0.35849\\
+        2&+1.27731&+0.58491&+0.17425&0.51815\\
+        3&+1.24949&+0.64737&+0.69241&0.18575\\
+        4&+1.16676&+0.83313&+0.60212&0.26848\\
+        5&+1.18117&+0.80076&+0.33363&0.09625\\
+        6&+1.22404&+0.70451&+0.38042&0.13912\\
+        7&+1.21657&+0.72128&+0.51953&0.04987\\
+        8&+1.19436&+0.77115&+0.49529&0.07208\\
+        9&+1.19823&+0.76246&+0.42321&0.02584\\
+        10&+1.20974&+0.73662&+0.43577&0.03735\\
+        11&+1.20773&+0.74112&+0.47312&0.01339\\
+        12&+1.20177&+0.75451&+0.46661&0.01935\\
+        13&+1.20281&+0.75218&+0.44726&0.00694\\
+        14&+1.20590&+0.74524&+0.45063&0.01003\\
+        15&+1.20536&+0.74645&+0.46066&0.00359\\
+        16&+1.20376&+0.75005&+0.45891&0.00520\\
+        17&+1.20404&+0.74942&+0.45371&0.00186\\
+        18&+1.20487&+0.74756&+0.45462&0.00269\\
+        19&+1.20472&+0.74788&+0.45731&0.00097\\
+        20&+1.20429&+0.74885&+0.45684&\\
+        \bottomrule
+    \end{tabular}
+    \label{tab:jacobi}
+\end{table}
+
+Utilizando o Mathematica, definimos a matriz \(D\) como a matriz diagonal cujas entradas são a diagonal de \(A\) e determinamos a matriz
+\begin{equation*}
+    J = D^{-1} (A - D) = 
+    \begin{pmatrix}
+        0. &&  0. && 0.159664\\
+        0. &&  0. && -0.358491\\
+        -1.&& 1. && 0.
+    \end{pmatrix}.
+\end{equation*}
+O espectro dessa matriz é aproximadamente dado pelo conjunto \(\sigma(J) = \set{0, \pm 0.719829i},\) portanto o raio espectral dessa matriz é \(\rho(J) = 0.719829.\) Com isso, para a precisão de \(\epsilon = 10^{-3},\) temos
+\begin{equation*}
+    \rho(J)^k \approx \epsilon \implies k \approx \frac{\ln \epsilon}{\ln \rho(J)} \implies k \approx 21.0127,
+\end{equation*}
+que é consistente com o número de iterações realizadas pelo programa.
+
+\section{Método de Gauss-Seidel}
+O método de Gauss-Seidel foi implementado com a função abaixo, modificação da linha 86 da função do método de Jacobi.
+\inputminted[firstline=109,lastline=152]{c}{src/main.c}
+
+O programa recebe a matriz do sistema dada por
+\begin{equation*}
+    A = \begin{pmatrix}
+        +11.90000&&+0.00000&&+1.90000&&+15.20000\\
+        +0.00000&&+5.30000&&-1.90000&&+3.10000\\
+        +1.00000&&-1.00000&&-1.00000&&+0.00000
+    \end{pmatrix}
+\end{equation*}
+e tem sua saída apresentada na \cref{tab:gauss_seidel}, obtendo as estimativas para a solução
+\begin{equation*}
+    \begin{cases}
+        i_1 \approx \SI{1.204}{\ampere}\\
+        i_2 \approx \SI{0.748}{\ampere}\\
+        i_3 \approx \SI{0.456}{\ampere}
+    \end{cases}
+\end{equation*}
+após doze iterações.
+
+\begin{table}[H]
+    \centering
+    \caption{Saída para o método de Gauss-Seidel}
+    \begin{tabular}{c c c c c}
+        \toprule
+        \(k\) & \(i^{(k)}_1\) & \(i^{(k)}_2\) & \(i^{(k)}_3\) & \(\max{\abs*{i^{(k+1)}_{j} - i^{(k)}_j}}\)\\
+        \midrule
+        0&+1.00000&+1.00000&+1.00000&0.82575\\
+        1&+1.11765&+0.94340&+0.17425&0.42787\\
+        2&+1.24949&+0.64737&+0.60212&0.22170\\
+        3&+1.18117&+0.80076&+0.38042&0.11488\\
+        4&+1.21657&+0.72128&+0.49529&0.05952\\
+        5&+1.19823&+0.76246&+0.43577&0.03084\\
+        6&+1.20773&+0.74112&+0.46661&0.01598\\
+        7&+1.20281&+0.75218&+0.45063&0.00828\\
+        8&+1.20536&+0.74645&+0.45891&0.00429\\
+        9&+1.20404&+0.74942&+0.45462&0.00222\\
+        10&+1.20472&+0.74788&+0.45684&0.00115\\
+        11&+1.20437&+0.74868&+0.45569&0.00060\\
+        12&+1.20455&+0.74827&+0.45629&\\
+        \bottomrule
+    \end{tabular}
+    \label{tab:gauss_seidel}
+\end{table}
+\section{Código na íntegra}
+Para que o programa possa resolver sistemas com um número arbitrário de equações, uma interface \verb|Matrix| de matrizes com alocação dinâmica foi criada, com cabeçalho abaixo. 
+\inputminted[fontsize=\footnotesize]{c}{src/matrix.h}
+
+Pela alocação dinâmica, foi tomado o devido cuidado para que toda a memória alocada seja desalocada. Além disso, por meio de ponteiros, a implementação da troca entre linhas de uma matriz foi simplificada, em comparação à implementação para matrizes alocadas na pilha.
+\inputminted[fontsize=\small]{c}{src/matrix.c}
+
+A rotina principal, cujas seções foram discutidas anteriormente, se encontra a seguir.
+\inputminted[fontsize=\small]{c}{src/main.c}
+
+Em futuros Exercícios Programa com manipulação de matrizes, utilizaremos a interface \verb|Matrix| acrescidas da função de pivotamento, assim como de escalonamento e substituição para traz, refatoradas a partir do método de Eliminação de Gauss.
+\end{document}
