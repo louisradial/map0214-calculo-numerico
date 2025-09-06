@@ -1,0 +1,137 @@
+% vim: spl=pt
+\documentclass[portuguese,minted]{artigo}
+\usepackage{booktabs}
+
+\setminted{
+    frame=lines,
+    framesep=2mm, 
+    baselinestretch=1.2,
+    fontsize=\footnotesize,
+    linenos
+}
+
+\author{Louis Bergamo Radial\\8992822}
+\title{MAP0214 - Cálculo Numérico Aplicado à Física\\Exercício Programa I - Zeros de funções}
+\begin{document}
+    \maketitle
+    Para os métodos numéricos, a linguagem C foi utilizada com o compilador \verb|gcc|, enquanto que o gráfico utilizado foi produzido com Python e as bibliotecas \verb|matplotlib| e \verb|numpy|. As condições de parada implementadas para os métodos numéricos foram baseadas na comparação  da diferença absoluta \(\abs{x_{n+1} - x_n}\) entre iterações com uma precisão dada \(\varepsilon,\) desde que o o número de iterações não passe do limite definido pela constante \verb|MAX_ITERATIONS|, igual a cem iterações.
+
+    \section{Método da bisseção}
+    O método da bisseção foi implementado com a função abaixo.
+    \inputminted[firstline=11,lastline=36]{c}{src/main.c}
+
+    Queremos determinar os zeros da função \(f(x) = x^3 + x + \cos(x).\) Como \(\abs{\cos{x}} \leq 1\) para todo \(x,\) segue que \(f(1) = 2 + \cos1 > 0\) e \(f(-1) = -2 + \cos1 < 0,\) portanto da continuidade da função \(f\) sabemos que há pelo menos um zero de \(f\) no intervalo \([-1,1].\) Ainda, consideramos sua derivada \(f'(x) = 3x^2 + 1 - \sin(x)\) e notamos que
+    \begin{equation*}
+        -1 \leq -\sin(x) \leq 1 \implies 0 \leq 1 - \sin(x) \leq 2 \implies 0 \leq 3x^2 \leq f'(x),
+    \end{equation*}
+    portanto concluímos que \(f'(x) \geq 0\) para todo \(x \in \mathbb{R}.\) Assim, \(f\) é crescente, logo injetora. Com isso, há apenas uma raiz da equação \(f(x) = 0,\) situada no intervalo \([-1,1]\).
+
+    Utilizando \(x_1 = -1\) e \(x_2 = 1\) com a precisão \(\varepsilon = 10^{-6},\) estimamos a raiz
+    \begin{equation*}
+        x_* \simeq 0.603520
+    \end{equation*}
+    para a função dada, com a saída do programa na \cref{tab:a}.
+    \begin{table}[H]
+        \centering
+        \caption{Saída para o método da bisseção}
+        \begin{tabular}{c c c c c c c}
+            \toprule
+            \(n\) & \(x_1\) & \(x_2\) & \(x_m\) & \(f(x_1)\) & \(f(x_m)\) & \(\abs{x_2 - x_1}\)\\
+            \midrule
+             0 &-1.000000 & 1.000000 & 0.000000 &-1.459698 & 1.000000 &2.000000\\
+             1 &-1.000000 & 0.000000 &-0.500000 &-1.459698 & 0.252583 &1.000000\\
+             2 &-1.000000 &-0.500000 &-0.750000 &-1.459698 &-0.440186 &0.500000\\
+             3 &-0.750000 &-0.500000 &-0.625000 &-0.440186 &-0.058178 &0.250000\\
+             4 &-0.625000 &-0.500000 &-0.562500 &-0.058178 & 0.105446 &0.125000\\
+             5 &-0.625000 &-0.562500 &-0.593750 &-0.058178 & 0.025778 &0.062500\\
+             6 &-0.625000 &-0.593750 &-0.609375 &-0.058178 &-0.015653 &0.031250\\
+             7 &-0.609375 &-0.593750 &-0.601562 &-0.015653 & 0.005198 &0.015625\\
+             8 &-0.609375 &-0.601562 &-0.605469 &-0.015653 &-0.005194 &0.007812\\
+             9 &-0.605469 &-0.601562 &-0.603516 &-0.005194 & 0.000011 &0.003906\\
+            10 &-0.605469 &-0.603516 &-0.604492 &-0.005194 &-0.002589 &0.001953\\
+            11 &-0.604492 &-0.603516 &-0.604004 &-0.002589 &-0.001289 &0.000977\\
+            12 &-0.604004 &-0.603516 &-0.603760 &-0.001289 &-0.000639 &0.000488\\
+            13 &-0.603760 &-0.603516 &-0.603638 &-0.000639 &-0.000314 &0.000244\\
+            14 &-0.603638 &-0.603516 &-0.603577 &-0.000314 &-0.000152 &0.000122\\
+            15 &-0.603577 &-0.603516 &-0.603546 &-0.000152 &-0.000071 &0.000061\\
+            16 &-0.603546 &-0.603516 &-0.603531 &-0.000071 &-0.000030 &0.000031\\
+            17 &-0.603531 &-0.603516 &-0.603523 &-0.000030 &-0.000010 &0.000015\\
+            18 &-0.603523 &-0.603516 &-0.603519 &-0.000010 & 0.000001 &0.000008\\
+            19 &-0.603523 &-0.603519 &-0.603521 &-0.000010 &-0.000005 &0.000004\\
+            20 &-0.603521 &-0.603519 &-0.603520 &-0.000005 &-0.000002 &0.000002\\
+            21 &-0.603520 &-0.603519 &-0.603520 &-0.000002 &-0.000001 &0.000001\\
+            \bottomrule
+        \end{tabular}
+        \label{tab:a}
+    \end{table}
+
+    \section{Método de Newton-Raphson}
+    O método de Newton-Raphson foi implementado com a função abaixo.
+    \inputminted[firstline=38,lastline=57]{c}{src/main.c}
+
+    Para o método de Newton-Raphson, utilizamos o valor inicial \(x_0 = -1\) e a precisão \(\varepsilon = 10^{-12},\) obtendo
+    \begin{equation*}
+        x_* \simeq -0.603519630885
+    \end{equation*}
+    como o zero de \(f,\) com a saída do programa na \cref{tab:b}.
+
+    \begin{table}[H]
+        \centering
+        \caption{Saída para o método de Newton-Raphson}
+        \begin{tabular}{c c c c c}
+            \toprule
+            \(n\) & \(x_n\) & \(f(x_n)\) & \(f'(x_n)\) & \(\abs{x_{n+1} - x_{n}}\)\\
+            \midrule
+            0 &-1.000000000000 &-1.459697694132 & 4.841470984808 &0.301498800408\\
+            1 &-0.698501199592 &-0.273495795486 & 3.106782395791 &0.088031847952\\
+            2 &-0.610469351640 &-0.018595640818 & 2.691270588003 &0.006909613957\\
+            3 &-0.603559737682 &-0.000106697751 & 2.660429938837 &0.000040105454\\
+            4 &-0.603519632228 &-0.000000003574 & 2.660251687343 &0.000000001344\\
+            5 &-0.603519630885 &0.000000000000 & 2.660251681371 &\\
+            \bottomrule
+        \end{tabular}
+        \label{tab:b}
+    \end{table}
+    \section{Energia do estado fundamental em poço finito de potencial}
+    O método das secantes foi implementado com a função abaixo.
+    \inputminted[firstline=59,lastline=83]{c}{src/main.c}
+
+    Para determinar possíveis valores iniciais para o método das secantes, o código abaixo foi utilizado para produzir o gráfico da função \(f(E) = \tan(\sqrt{E + V_0}) - \sqrt{\frac{-E}{E + V_0}},\) apresentado na \cref{fig:plot}.
+    \inputminted{python}{src/plot.py}
+    \begin{figure}[!ht]
+        \centering
+        \includegraphics[width=0.5\textwidth]{src/plot.png}
+        \caption{Gráfico da função que determina a energia do estado fundamental}
+        \label{fig:plot}
+    \end{figure}
+
+    Pelo gráfico, vemos que a raiz da função se encontra no intervalo \((-8, -7),\) portanto os valores iniciais escolhidos são \(x_0 = -8\) e \(x_1 = -7.\) A saída do programa com o critério de parada determinado pela precisão \(\varepsilon = 10^{-12}\) encontra-se na \cref{tab:c}, obtendo 
+    \begin{equation*}
+        E \simeq -7.630816962365 \frac{\hbar^2}{2ma^2}
+    \end{equation*}
+    como a estimativa para a energia do estado fundamental.
+
+    \begin{table}[H]
+        \centering
+        \caption{Saída para o método das secantes}
+        \begin{tabular}{c c c c}
+            \toprule
+            \(n\) & \(x_{n}\) & \(f(x_{n})\) & \(\abs{x_{n+1} - x_n}\)\\
+            \midrule
+            0 & -8.000000000000 &-1.271019400091 &1.000000000000\\
+            1 & -7.000000000000 & 4.463290473655 &0.778348322976\\
+            2 & -7.778348322976 &-0.532597739386 &0.082977548655\\
+            3 & -7.695370774321 &-0.240112344733 &0.068119414275\\
+            4 & -7.627251360046 & 0.013663507132 &0.003667607048\\
+            5 & -7.630918967094 &-0.000390210028 &0.000101833347\\
+            6 & -7.630817133747 &-0.000000655638 &0.000000171390\\
+            7 & -7.630816962357 & 0.000000000031 &0.000000000008\\
+            8 & -7.630816962365 & 0.000000000000 &\\
+            \bottomrule
+        \end{tabular}
+        \label{tab:c}
+    \end{table}
+
+    \section{Código na íntegra}
+    \inputminted[fontsize=\small]{c}{src/main.c}
+\end{document}
