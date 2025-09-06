@@ -1,0 +1,12 @@
+*.log
+*.aux
+*.synctex.gz
+*.fls
+*.toc
+*.fdb_latexmk
+*.out
+*.pdf
+*.png
+*obj/
+*.xopp
+main
