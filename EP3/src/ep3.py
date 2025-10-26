@@ -9,13 +9,30 @@ if __name__ == "__main__":
     e_float = ex1.iloc[:,4].to_numpy();
     e_double = ex1.iloc[:,7].to_numpy();
     fig1 = plt.figure(layout="constrained");
+    f_simpson_lin = np.polyfit(p[0:4],e_float[0:4],1);
+    d_simpson_lin = np.polyfit(p[0:10],e_double[0:10],1);
+    p_f_simpson = np.linspace(0,5);
+    p_d_simpson = np.linspace(0,12);
+    f_simpson_fit = f_simpson_lin[0]*p_f_simpson + f_simpson_lin[1];
+    d_simpson_fit = d_simpson_lin[0]*p_d_simpson + d_simpson_lin[1];
+    f_roundoff_lin = np.polyfit(p[4:19],e_float[4:19],1);
+    d_roundoff_lin = np.polyfit(p[11:],e_double[11:],1);
+    p_float_roundoff = np.linspace(4,21);
+    p_double_roundoff = np.linspace(11,26);
+    f_roundoff_fit = f_roundoff_lin[0]*p_float_roundoff + f_roundoff_lin[1];
+    d_roundoff_fit = d_roundoff_lin[0]*p_double_roundoff + d_roundoff_lin[1];
     plt.grid(alpha=0.4);
     plt.title("Erro no método de Simpson")
     plt.xlim([0,26]);
+    plt.ylim([-51,1]);
     plt.xlabel("p");
     plt.ylabel(r"$\log_2(\epsilon)$");
-    plt.plot(p, e_float, color="#f4b8e4aa", lw=0.5);
-    plt.plot(p, e_double, color="#ca9ee6aa", lw=0.5);
+    plt.plot(p_d_simpson, d_simpson_fit, color="#ca9ee6aa", lw=0.5, 
+             label=rf"$\Delta$y={d_simpson_lin[0]:.3f}$\Delta$x");
+    plt.plot(p_double_roundoff, d_roundoff_fit, color="#ca9ee6aa", ls="-.",
+             lw=0.5,label=rf"$\Delta$y={d_roundoff_lin[0]:.3f}$\Delta$x");
+    plt.plot(p_float_roundoff, f_roundoff_fit, color="#f4b8e4aa", lw=0.5, 
+             label=rf"$\Delta$y={f_roundoff_lin[0]:.3f}$\Delta$x");
     plt.scatter(p, e_float, label="float", color="#ea76cb", marker=".");
     plt.scatter(p, e_double, label="double", color="#8839ef", marker=".");
     plt.legend();
@@ -46,6 +63,8 @@ if __name__ == "__main__":
     plt.yticks([18/30, 19/30, 20/30, 21/30],
                labels=["0.6", "", r"$\frac{2}{3}$", "0.7"]);
     plt.ylim([18/30, 21/30]);
-    plt.errorbar(x=n, y=i, yerr=s, color="#ca9ee6aa", marker=".", markerfacecolor="#8839ef", linewidth=0.5, elinewidth=1, ecolor="#6c6f85");
+    plt.errorbar(x=n, y=i, yerr=s, color="#ca9ee6aa", marker=".",
+                 markerfacecolor="#8839ef", linewidth=0.5, elinewidth=1,
+                 ecolor="#6c6f85");
     plt.xscale("log",base=2);
     fig3.savefig("3.png",dpi=500);
