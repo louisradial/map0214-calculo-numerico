@@ -63,7 +63,7 @@ Para a integral \(I = \int_0^1\dli{x} (5 - 5x^4) = 4,\) a função acima produzi
     \label{tab:ex1}
 \end{table}
 
-A \cref{fig:ex1} mostra um gráfico \(\log_2(\varepsilon) \times p\), em que é possível ver que o erro do método numérico domina até certo valor de \(p\) e após isso os erros de ponto flutuante são mais significativos, a depender da precisão utilizada. Para o método de Simpson, o erro de truncamento é da ordem de \(\mathcal{O}(h^4) \sim \mathcal{O}(N^{-4}),\) que é compatível com a inclinação da ordem de \(-4\) do gráfico logarítmico para \(1 \leq p \leq 5\) em precisão simples e \(1 \leq p \leq 12\) em precisão dupla. As inclinações da ordem de \(0.5\) do gráfico para \(5 \leq p \leq 16\) em precisão simples e \(12 \leq p \leq 25\) em precisão dupla são compatíveis com o erro de \emph{roundoff}, que é da ordem de \(\mathcal{O}(\sqrt{N}).\)
+A \cref{fig:ex1} mostra um gráfico \(\log_2(\varepsilon) \times p\), em que é possível ver que o erro do método numérico domina até certo valor de \(p\) e após isso os erros de ponto flutuante são mais significativos, a depender da precisão utilizada. Para o método de Simpson, o erro de truncamento é da ordem de \(\mathcal{O}(h^4) \sim \mathcal{O}(N^{-4}),\) que é compatível com a inclinação de \(-4.000\) do gráfico logarítmico para \(1 \leq p \leq 5\) em precisão simples e \(1 \leq p \leq 12\) em precisão dupla. As inclinações da ordem de \(0.5\) do gráfico para \(5 \leq p \leq 16\) em precisão simples e \(12 \leq p \leq 25\) em precisão dupla são compatíveis com o erro de \emph{roundoff}, que é da ordem de \(\mathcal{O}(\sqrt{N}).\)
 
 \begin{figure}[!ht]
     \centering
