@@ -1,0 +1,199 @@
+% vim: spl=pt
+\documentclass[portuguese,minted]{artigo}
+\usepackage{booktabs}
+\usepackage{circuitikz}
+
+\setminted{
+    frame=lines,
+    framesep=2mm, 
+    baselinestretch=1.2,
+    fontsize=\footnotesize,
+    linenos
+}
+
+\author{Louis Bergamo Radial\\8992822}
+\title{MAP0214 - Cálculo Numérico Aplicado à Física\\Exercício Programa III - Integração Numérica}
+\begin{document}
+\maketitle
+
+Para os métodos numéricos, a linguagem C foi utilizada com o compilador \verb|gcc|, enquanto que os gráficos produzidos foram feitos com a biblioteca \verb|matplotlib| do Python.
+
+\section{Método de Simpson}
+A função utilizada para implementar o método da regra de Simpson se encontra a seguir. Esta rotina utiliza precisão simples, enquanto que a rotina de precisão dupla é análoga a essa, exceto com a substituição de \verb|float| para \verb|double|.
+\inputminted[firstline=27,lastline=38]{c}{src/main.c}
+
+As funções de precisão simples e dupla foram utilizadas utilizando valores diferentes de \(p,\) onde \(N = 2^p\) é o número de intervalos utilizados, segundo a rotina abaixo, que salva em um arquivo os valores das integrações numéricas, assim como o erro absoluto \(\varepsilon = \abs{I_{\mathrm{num}} - I}\) e o seu logaritmo \(\log_2(\varepsilon),\) onde \(I\) é o valor exato da integral.
+\inputminted[firstline=40,lastline=61]{c}{src/main.c}
+
+Para a integral \(I = \int_0^1\dli{x} (5 - 5x^4) = 4,\) a função acima produziu os resultados da \cref{tab:ex1}.
+\begin{table}[!ht]
+    \centering
+    \caption{Saída para o método da regra de Simpson}
+    \begin{tabular}{c c c c c c}
+        \toprule
+        \(p\) & \(N\) & \(I_\mathrm{num}^\mathrm{float}\) & \(\varepsilon^{\mathrm{float}}\) & \(I_\mathrm{num}^\mathrm{double}\) & \(\varepsilon^{\mathrm{double}}\)\\
+        \midrule
+         1&        2& 3.958333253860& 0.041666746140&  3.958333333333& 0.041666666667\\
+         2&        4& 3.997395753860& 0.002604246140&  3.997395833333& 0.002604166667\\
+         3&        8& 3.999837160110& 0.000162839890&  3.999837239583& 0.000162760417\\
+         4&       16& 3.999989748001& 0.000010251999&  3.999989827474& 0.000010172526\\
+         5&       32& 3.999998807907& 0.000001192093&  3.999999364217& 0.000000635783\\
+         6&       64& 4.000000476837& 0.000000476837&  3.999999960264& 0.000000039736\\
+         7&      128& 4.000000476837& 0.000000476837&  3.999999997516& 0.000000002484\\
+         8&      256& 4.000000476837& 0.000000476837&  3.999999999845& 0.000000000155\\
+         9&      512& 4.000000476837& 0.000000476837&  3.999999999990& 0.000000000010\\
+        10&     1024& 3.999996423721& 0.000003576279&  3.999999999999& 0.000000000001\\
+        11&     2048& 4.000004291534& 0.000004291534&  4.000000000000& 0.000000000000\\
+        12&     4096& 4.000005245209& 0.000005245209&  4.000000000000& 0.000000000000\\
+        13&     8192& 3.999997377396& 0.000002622604&  4.000000000000& 0.000000000000\\
+        14&    16384& 3.999993324280& 0.000006675720&  4.000000000000& 0.000000000000\\
+        15&    32768& 4.000006198883& 0.000006198883&  4.000000000000& 0.000000000000\\
+        16&    65536& 4.000001430511& 0.000001430511&  4.000000000000& 0.000000000000\\
+        17&   131072& 4.000017642975& 0.000017642975&  4.000000000000& 0.000000000000\\
+        18&   262144& 4.000120639801& 0.000120639801&  4.000000000000& 0.000000000000\\
+        19&   524288& 4.000121116638& 0.000121116638&  4.000000000000& 0.000000000000\\
+        20&  1048576& 4.000541687012& 0.000541687012&  4.000000000000& 0.000000000000\\
+        21&  2097152& 4.003906726837& 0.003906726837&  4.000000000000& 0.000000000000\\
+        22&  4194304& 4.012409687042& 0.012409687042&  4.000000000000& 0.000000000000\\
+        23&  8388608& 3.930215597153& 0.069784402847&  4.000000000000& 0.000000000000\\
+        24& 16777216& 4.079232215881& 0.079232215881&  4.000000000000& 0.000000000000\\
+        25& 33554432& 4.338248252869& 0.338248252869&  4.000000000000& 0.000000000000\\
+        \bottomrule
+    \end{tabular}
+    \label{tab:ex1}
+\end{table}
+
+A \cref{fig:ex1} mostra um gráfico \(\log_2(\varepsilon) \times p\), em que é possível ver que o erro do método numérico domina até certo valor de \(p\) e após isso os erros de ponto flutuante são mais significativos, a depender da precisão utilizada. Para o método de Simpson, o erro de truncamento é da ordem de \(\mathcal{O}(h^4) \sim \mathcal{O}(N^{-4}),\) que é compatível com a inclinação da ordem de \(-4\) do gráfico logarítmico para \(1 \leq p \leq 5\) em precisão simples e \(1 \leq p \leq 12\) em precisão dupla. As inclinações da ordem de \(0.5\) do gráfico para \(5 \leq p \leq 16\) em precisão simples e \(12 \leq p \leq 25\) em precisão dupla são compatíveis com o erro de \emph{roundoff}, que é da ordem de \(\mathcal{O}(\sqrt{N}).\)
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{src/1.png}
+    \caption{Erro do método de Simpson na integração da função \(f(x) = 5 - 5x^4\).}
+    \label{fig:ex1}
+\end{figure}
+
+\section{Período do pêndulo simples}
+A rotina a seguir utiliza o método de trapézios para determinar, em unidades de \(T_{\mathrm{Galileu}} = 2\pi \sqrt{\frac{\ell}{g}},\) o período de oscilação \(T\) de um pêndulo simples de comprimento \(\ell\) partindo do repouso com um ângulo inicial \(\theta_0.\)
+\inputminted[firstline=65,lastline=83]{c}{src/main.c}
+
+Para produzir o gráfico \(T \times \theta_0,\) mostrado na \cref{fig:ex2}, a rotina a seguir foi utilizada, que salva em um arquivo os valores linearmente espaçados de \(\theta_0\) no intervalo \([0, \pi).\) Os resultados para vinte ângulos iniciais são encontrados na \cref{tab:ex2}.
+\inputminted[firstline=85,lastline=97]{c}{src/main.c}
+
+\begin{table}[!ht]
+    \centering
+    \caption{Período do pêndulo simples calculado pelo método de trapézios}
+    \begin{tabular}{c c c}
+        \toprule
+        \(n\) & \(\theta_0\) & \(T/T_{\mathrm{Galileu}}\)\\
+        \midrule
+         1&   8.57&   1.001415851137\\
+         2&  17.14&   1.005639309932\\
+         3&  25.71&   1.012751649768\\
+         4&  34.29&   1.022866218786\\
+         5&  42.86&   1.036149024512\\
+         6&  51.43&   1.052826930948\\
+         7&  60.00&   1.073199626481\\
+         8&  68.57&   1.097656796615\\
+         9&  77.14&   1.126702790149\\
+        10&  85.71&   1.160992499651\\
+        11&  94.29&   1.201384687539\\
+        12& 102.86&   1.249023606613\\
+        13& 111.43&   1.305468733455\\
+        14& 120.00&   1.372911018196\\
+        15& 128.57&   1.454555709948\\
+        16& 137.14&   1.555354860523\\
+        17& 145.71&   1.683562498091\\
+        18& 154.29&   1.854559008326\\
+        19& 162.86&   2.102657306695\\
+        20& 171.43&   2.536713749410\\
+        \bottomrule
+    \end{tabular}
+    \label{tab:ex2}
+\end{table}
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{src/2.png}
+    \caption{Período de um pêndulo simples em unidades de \(T_{\mathrm{Galileu}} = 2\pi \sqrt{\ell/g}\).}
+    \label{fig:ex2}
+\end{figure}
+
+A medida que \(\theta_0\) se aproxima de \(\pi,\) o período do pêndulo simples aumenta indefinidamente, de tal sorte que \(T \to \infty\) quando \(\theta_0 \to \pi.\)
+
+\section{Quadratura da parábola}
+A rotina abaixo implementa um \emph{linear congruential generador} (LCG) com \(Z_{i+1} = (aZ_i + b) \mod m.\)
+\inputminted[firstline=101,lastline=127]{c}{src/main.c}
+
+O LCG com parâmetros \(a = 1664525,\) \(b = 1013904223,\) \(m = 2147483647\) e semente \(Z_0 = 8992822\) produz os dez primeiro resultados mostrados na \cref{tab:lcg}.
+\begin{table}[!ht]
+    \centering
+    \caption{Saída do \emph{linear congruential generator}.}
+    \begin{tabular}{c c c}
+        \toprule
+        \(i\) & \(Z_i\) & \(U_i\)\\
+        \midrule
+        0 &  8992822 & 0.004187609071\\
+        1& 1829924183&0.852124851128\\
+        2& 1266929497& 0.589960020776\\
+        3& 1451093207& 0.675717931090\\
+        4& 1849806295& 0.861383181001\\
+        5&  668922380& 0.311491256725\\
+        6&  979758928& 0.456235803876\\
+        7&  802263271& 0.373582947708\\
+        8& 1348982312& 0.628168840254\\
+        9&  453031882& 0.210959409462\\
+        10& 1467097164& 0.683170354312\\
+        \bottomrule
+    \end{tabular}
+    \label{tab:lcg}
+\end{table}
+
+A rotina abaixo implementa a integração pelo método de Monte-Carlo de uma função \(f : [x_0, x_1] \to [0,1]\), utilizando o LCG.
+\inputminted[firstline=149,lastline=162]{c}{src/main.c}
+
+Para a quadratura da parábola \(y = 1 - x^2\) foi utilizada a rotina a seguir, com os resultados na \cref{tab:ex3}.
+\inputminted[firstline=164,lastline=192]{c}{src/main.c}
+\begin{table}[!ht]
+    \centering
+    \caption{Saída para o método de Monte-Carlo}
+    \begin{tabular}{c c c c}
+        \toprule
+        \(N_t\) & \(I_m\) & \(\sigma\) & \(\sigma_m\)\\
+        \midrule
+             2& 0.610000000000& 0.014142135624& 0.010000000000\\
+             4& 0.660000000000& 0.043969686528& 0.021984843264\\
+             8& 0.635000000000& 0.047509397567& 0.016797108595\\
+            16& 0.667500000000& 0.047116875958& 0.011779218989\\
+            32& 0.677187500000& 0.052069084072& 0.009204600609\\
+            64& 0.666875000000& 0.045421308194& 0.005677663524\\
+           128& 0.663984375000& 0.044885503399& 0.003967355479\\
+           256& 0.668320312500& 0.049830211105& 0.003114388194\\
+           512& 0.666601562500& 0.044265846914& 0.001956292533\\
+          1024& 0.666445312500& 0.048084124489& 0.001502628890\\
+          2048& 0.666269531250& 0.045615259934& 0.001007964363\\
+          4096& 0.667741699219& 0.047675671471& 0.000744932367\\
+          8192& 0.665889892578& 0.047749898683& 0.000527566831\\
+         16384& 0.667048339844& 0.047291698787& 0.000369466397\\
+         32768& 0.666776733398& 0.047425416798& 0.000261990889\\
+         65536& 0.666488952637& 0.047204624938& 0.000184393066\\
+        131072& 0.666958236694& 0.047247463236& 0.000130503913\\
+        \bottomrule
+    \end{tabular}
+    \label{tab:ex3}
+\end{table}
+
+Os resultados obtidos convergem para \(I = \frac23\) como esperado.
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{src/3.png}
+    \caption{Convergência do método de Monte-Carlo.}
+    \label{fig:ex3}
+\end{figure}
+\section{Código na íntegra}
+
+A rotina principal, cujas seções foram discutidas anteriormente, se encontra a seguir.
+\inputminted[fontsize=\small]{c}{src/main.c}
+
+O programa feito para produzir os gráficos das \cref{fig:ex1,fig:ex2,fig:ex3} se encontra abaixo.
+\inputminted[fontsize=\small]{python}{src/ep3.py}
+\end{document}
