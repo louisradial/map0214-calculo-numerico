@@ -70,8 +70,38 @@ Consideramos o potencial de poço duplo, com equação de movimento
 onde os parâmetros do sistema são o amortecimento \(\gamma,\) a amplitude da força externa \(F,\) e a frequência de oscilação da força externa \(\omega.\) Para este problema, definimos a função e o macro abaixo, que são usados com a subrotina \verb|solve_rk4|.
 \inputminted[firstline=117,lastline=124]{c}{src/main.c}
 \subsection{Espaço de fase}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{src/2a.png}
+    \caption{Espaço de fase do potencial poço duplo sem amortecimento ou força externa.}
+    \label{fig:ex2a}
+\end{figure}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{src/2b.png}
+    \caption{Espaço de fase do potencial poço duplo com amortecimento.}
+    \label{fig:ex2b}
+\end{figure}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{src/2c.png}
+    \caption{Espaço de fase do potencial poço duplo com amortecimento e força externa.}
+    \label{fig:ex2c}
+\end{figure}
 \subsection{Diagrama de bifurcação}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{src/2d.png}
+    \caption{Diagrama de bifurcação}
+    \label{fig:ex2d}
+\end{figure}
 \subsection{Mapa de Poincaré}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{src/2e.png}
+    \caption{Mapa de Poincaré}
+    \label{fig:ex2e}
+\end{figure}
 
 \section{Código na íntegra}
 A rotina principal, cujas seções foram discutidas anteriormente, se encontra a seguir.
