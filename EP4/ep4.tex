@@ -3,7 +3,6 @@
 \usepackage{booktabs}
 \usepackage{circuitikz}
 
-% \DeclareUnicodeCharacter{3B3}{$\gamma$}
 \setmonofont{Iosevka Nerd Font Mono}
 
 \setminted{
@@ -95,6 +94,35 @@ onde os parâmetros do sistema são o amortecimento \(\gamma,\) a amplitude da f
     \caption{Diagrama de bifurcação}
     \label{fig:ex2d}
 \end{figure}
+
+Para estimar a constante de Feigenbaum, consideramos a região \(0.18 \leq F \leq 0.207\) e reduzimos o passo para \(\Delta F = 5 \cdot 10^-5.\)
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{src/2d2.png}
+    \caption{Diagrama de bifurcação com \(F \in [0.18, 0.207]\).}
+    \label{fig:feigenbaum}
+\end{figure}
+Vemos que as bifurcações acontecem em \(F_1 = 0.1816,\) \(F_2 = 0.2007,\) \(F_3 = 0.2049,\) e \(F_4 = 0.2058.\) Definindo 
+\begin{equation*}
+    \delta_n = \frac{F_{n-1} - F_{n-2}}{F_n - F_{n-1}},
+\end{equation*}
+obtemos uma estimativa de \(\delta \approx 4.66667\), como mostrado na \cref{tab:feigenbaum}. Para melhorar a estimativa poderíamos repetir o processo, diminuindo cada vez mais o passo.
+\begin{table}[!ht]
+    \centering
+    \caption{Estimativa da constante de Feigenbaum}
+    \begin{tabular}{c c c}
+        \toprule
+        \(n\) & \(F_n\) & \(\delta_n\)\\
+        \midrule
+        1 & 0.1816 & \\
+        2 & 0.2007 & \\
+        3 & 0.2049 & 4.54762\\
+        4 & 0.2058 & 4.66667\\
+        \bottomrule
+    \end{tabular}
+    \label{tab:feigenbaum}
+\end{table}
+
 \subsection{Mapa de Poincaré}
 \begin{figure}[!ht]
     \centering

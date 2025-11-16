@@ -116,6 +116,17 @@ if __name__ == "__main__":
     plt.show();
     fig2d.savefig("2d.png", dpi=500);
 
+    feigenbaum = pd.read_csv("feigenbaum.csv", sep=",", header=None);
+    f = feigenbaum.iloc[:,3].to_numpy();
+    x = feigenbaum.iloc[:,1].to_numpy();
+    fig2d2 = plt.figure(layout="constrained");
+    plt.title("Diagrama de bifurcação")
+    plt.xlabel(r"$F$");
+    plt.ylabel(r"$x$");
+    plt.scatter(f, x, s = 0.1, color="#ea76cb");
+    plt.show();
+    fig2d2.savefig("2d2.png", dpi=500);
+
     poincaré_map = pd.read_csv("poincaré_map.csv", sep=",", header=None);
     x = poincaré_map.iloc[:,1].to_numpy();
     v = poincaré_map.iloc[:,2].to_numpy();

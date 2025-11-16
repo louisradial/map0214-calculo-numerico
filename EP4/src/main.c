@@ -162,6 +162,15 @@ int main() {
         poincaré(duffing, t0, x0, v0, period, 2000, 100, f, poincaré_section);
     }
     fclose(poincaré_section);
+    // feigenbaum constant
+    FILE* feigenbaum = fopen("feigenbaum.csv", "w");
+    df = 5e-5;
+    fmax = 0.205;
+    for (double f = 0.18; fabs(f - 0.207) > df/2; f += df) {
+        duffing.params[1] = f;
+        poincaré(duffing, t0, x0, v0, period, 2000, 100, f, feigenbaum);
+    }
+    fclose(feigenbaum);
     // 4 poincaré map
     FILE* poincaré_map = fopen("poincaré_map.csv", "w");
     duffing.params[1]=0.24;
