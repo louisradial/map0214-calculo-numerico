@@ -1,0 +1,83 @@
+% vim: spl=pt
+\documentclass[portuguese,minted]{artigo}
+\usepackage{booktabs}
+\usepackage{circuitikz}
+
+% \DeclareUnicodeCharacter{3B3}{$\gamma$}
+\setmonofont{Iosevka Nerd Font Mono}
+
+\setminted{
+    frame=lines,
+    framesep=2mm, 
+    baselinestretch=1.2,
+    fontsize=\footnotesize,
+    linenos
+}
+
+\author{Louis Bergamo Radial\\8992822}
+\title{MAP0214 - Cálculo Numérico Aplicado à Física\\Exercício Programa IV - Equações Diferenciais Ordinárias}
+\begin{document}
+\maketitle
+
+Para os métodos numéricos, a linguagem C foi utilizada com o compilador \verb|gcc|, enquanto que os gráficos produzidos foram feitos com a biblioteca \verb|matplotlib| do Python.
+
+\section{Método de Runge-Kutta clássico de quarta ordem}
+O Exercício Programa (EP) exige a solução de EDOs de segunda ordem \(\ddot{x}(t) = g(t, x(t), \dot{x}(t))\), que podem ser manipuladas para serem tratadas como um sistema de EDOs de primeira ordem segundo
+\begin{equation*}
+    \dot{x}(t) = v(t) \quad\text{e}\quad \dot{v}(t) = g(t, x(t), v(t)).
+\end{equation*}
+
+Para a implementação de integração de equações diferenciais ordinárias (EDOs) foi criada uma \emph{struct} \(\verb|ode|\) que armazena tanto o ponteiro da função que caracteriza a equação diferencial quanto os parâmetros utilizados nesta função. A função \verb|compute| calcula a função da EDO no instante desejado, já utilizando os seus parâmetros.
+\inputminted[firstline=5,lastline=16]{c}{src/main.c}
+
+Para testar a implementação do método de Runge-Kutta clássico de quarta ordem (RK4) e comparar com o método de Euler, consideramos a EDO \(\ddot{y} = \dot{y} + y - t^3 - 4t^2 + 4t + 2\) com \(y(0) = \dot{y}(0) = 0,\) cuja solução analítica é \(y = t^3 + t^2.\) Para ambos os métodos, uma subrotina, \verb|euler| e \verb|rk4|, foi criada que calcula um passo da iteração e uma subrotina, \verb|solve_euler| e \verb|solve_rk4|, que itera sobre todo o período de integração e escreve os dados em um arquivo. Para uso no resto do EP, a função \verb|solve_rk4| também permite que a parte dos dados que é escrita em um arquivo seja feita a partir de um instante intermediário do período de integração.
+\inputminted[firstline=18,lastline=88]{c}{src/main.c}
+
+Para a comparação, as interações foram feitas com o passo \(h = 0.01,\) e os resultados foram plotados na \cref{fig:ex1}. Para o método de Euler, ao final da integração foi obtido
+\begin{equation*}
+    y_{\mathrm{Euler}}(6) = 51.206789
+    \quad\text{e}\quad
+    \dot{y}_{\mathrm{Euler}}(6) = -204.564558,
+\end{equation*}
+enquanto que para RK4, foi obtido
+\begin{equation*}
+    y_{\mathrm{RK4}}(6) = 251.999983
+    \quad\text{e}\quad
+    \dot{y}_{\mathrm{RK4}}(6) = 119.999972,
+\end{equation*}
+que devem ser comparados com \(y(6) = 252\) e \(\dot{y}(6) = 120.\)
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{src/1.png}
+    \caption{Comparação do método RK4 e de Euler}
+    \label{fig:ex1}
+\end{figure}
+
+Na \cref{fig:ex1} não é possível discernir as curvas da solução analítica e a integrada numericamente por RK4, mesmo com o passo modesto de \(h = 0.01.\) A \cref{fig:ex1b} apresenta o erro relativo entre a solução analítica e RK4, tanto para \(y\) quanto para \(\dot{y},\) mostrando que os erros foram da ordem de \(10^{-8}\) para \(y\) e \(10^{-7}\) para \(\dot{y}.\) Apesar destes gráficos mostrarem que o erro aumenta conforme o intervalo de integração aumenta, utilizaremos um passo menor para as próximas tarefas, o que reduz o erro relativo.
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{src/1b.png}
+    \caption{Comparação do método RK4 e da solução analítica}
+    \label{fig:ex1b}
+\end{figure}
+
+\section{Potencial poço duplo}
+Consideramos o potencial de poço duplo, com equação de movimento
+\begin{equation*}
+    \ddot{x} = \frac12 x(1 - x^2) - 2 \gamma \dot{x} + F \cos(\omega t),
+\end{equation*}
+onde os parâmetros do sistema são o amortecimento \(\gamma,\) a amplitude da força externa \(F,\) e a frequência de oscilação da força externa \(\omega.\) Para este problema, definimos a função e o macro abaixo, que são usados com a subrotina \verb|solve_rk4|.
+\inputminted[firstline=117,lastline=124]{c}{src/main.c}
+\subsection{Espaço de fase}
+\subsection{Diagrama de bifurcação}
+\subsection{Mapa de Poincaré}
+
+\section{Código na íntegra}
+A rotina principal, cujas seções foram discutidas anteriormente, se encontra a seguir.
+\inputminted[fontsize=\small]{c}{src/main.c}
+
+O programa feito para produzir os gráficos das %\cref{fig:ex1,fig:ex2,fig:ex3} 
+se encontra abaixo.
+\inputminted[fontsize=\small]{python}{src/plot.py}
+\end{document}
