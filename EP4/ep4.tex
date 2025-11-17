@@ -69,44 +69,58 @@ Consideramos o potencial de poço duplo, com equação de movimento
 onde os parâmetros do sistema são o amortecimento \(\gamma,\) a amplitude da força externa \(F,\) e a frequência de oscilação da força externa \(\omega.\) Para este problema, definimos a função e o macro abaixo, que são usados com a subrotina \verb|solve_rk4|.
 \inputminted[firstline=117,lastline=124]{c}{src/main.c}
 \subsection{Espaço de fase}
+Para o sistema sem amortecimento e força externa, verificamos a dependência nas condições iniciais modificando \(\dot{x}(0).\) A \cref{fig:ex2a} mostra os diagramas de espaço de fase com \(x(0) = -1,\) e \(\dot{x}(0) \in \set{0.1, 0.5, 1}.\)
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.5\textwidth]{src/2a.png}
     \caption{Espaço de fase do potencial poço duplo sem amortecimento ou força externa.}
     \label{fig:ex2a}
 \end{figure}
+
+Para o sistema com amortecimento, fixamos o \(x(0) = -1\) e \(\dot{x}(0) = -1,\) e variamos \(\gamma\). A \cref{fig:ex2b} mostra os diagramas de espaço de fase com \(2\gamma \in \set{0.25, 0.8}.\)
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.5\textwidth]{src/2b.png}
     \caption{Espaço de fase do potencial poço duplo com amortecimento.}
     \label{fig:ex2b}
 \end{figure}
+
+Para o sistema com força externa, fixamos \(2\gamma = 0.25\) e \(\omega = 0.95,\) e variamos a amplitude \(F\). A \cref{fig:ex2c} mostra os diagramas de espaço de fase com \(F \in \set{0.19, 0.203, 0.24, 0.33}\) apenas em regime estacionário. Para ignorar o transiente, utilizamos o tempo inicial de registro para \(t_i = 400\) e tempo final \(t_f\) para todos os valores de \(F\) exceto para \(F = 0.24,\) em que utilizamos \(t_i = 1200\) e \(t_f = 1500.\)
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.5\textwidth]{src/2c.png}
     \caption{Espaço de fase do potencial poço duplo com amortecimento e força externa.}
     \label{fig:ex2c}
 \end{figure}
-\subsection{Diagrama de bifurcação}
+
+\subsection{Seções de Poincaré}
+Para as seções de Poincaré utilizadas nos diagramas de bifurcação e no mapa de Poincaré, foi criada a subrotina \verb|poincaré|, disponível abaixo. Esta função evolui o sistema por \verb|t_periods| períodos, que deve corresponder ao transiente, e depois evolui o sistema em estado estacionário por \verb|s_periods|, escrevendo os resultados em um arquivo a cada período.
+\inputminted[firstline=90,lastline=109]{c}{src/main.c}
+
+\subsubsection{Diagrama de bifurcação}
+O diagrama de bifurcação foi feito com a rotina abaixo. Nela, variamos \(F\) no intervalo \([0, 0.7]\) com um passo de \(\Delta F = 5\cdot 10^{-4},\) utilizamos um transiente de 2000 períodos e evoluímos o sistema em estado estacionário por 100 períodos.
+\inputminted[firstline=155,lastline=164]{c}{src/main.c}
+
+A \cref{fig:ex2d} mostra o diagrama de bifurcação produzido com os resultados obtidos.
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=0.5\textwidth]{src/2d.png}
-    \caption{Diagrama de bifurcação}
-    \label{fig:ex2d}
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{src/2d.png}
+        \caption{Diagrama de bifurcação}
+        \label{fig:ex2d}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{src/2d2.png}
+        \caption{Região com \(0.18 \leq F \leq 0.207\)}
+        \label{fig:ex2d2}
+    \end{subfigure}
 \end{figure}
 
-Para estimar a constante de Feigenbaum, consideramos a região \(0.18 \leq F \leq 0.207\) e reduzimos o passo para \(\Delta F = 5 \cdot 10^-5.\)
-\begin{figure}[!ht]
-    \centering
-    \includegraphics[width=0.5\textwidth]{src/2d2.png}
-    \caption{Diagrama de bifurcação com \(F \in [0.18, 0.207]\).}
-    \label{fig:feigenbaum}
-\end{figure}
-Vemos que as bifurcações acontecem em \(F_1 = 0.1816,\) \(F_2 = 0.2007,\) \(F_3 = 0.2049,\) e \(F_4 = 0.2058.\) Definindo 
-\begin{equation*}
-    \delta_n = \frac{F_{n-1} - F_{n-2}}{F_n - F_{n-1}},
-\end{equation*}
-obtemos uma estimativa de \(\delta \approx 4.66667\), como mostrado na \cref{tab:feigenbaum}. Para melhorar a estimativa poderíamos repetir o processo, diminuindo cada vez mais o passo.
+Para estimar a constante de Feigenbaum, consideramos a região \(0.18 \leq F \leq 0.207\) e reduzimos o passo para \(\Delta F = 5 \cdot 10^{-5},\) produzindo o diagrama apresentado na \cref{fig:ex2d2}. 
+
 \begin{table}[!ht]
     \centering
     \caption{Estimativa da constante de Feigenbaum}
@@ -123,7 +137,17 @@ obtemos uma estimativa de \(\delta \approx 4.66667\), como mostrado na \cref{tab
     \label{tab:feigenbaum}
 \end{table}
 
-\subsection{Mapa de Poincaré}
+Sendo \(F_n\) o valor de \(F\) na \(n\)-ésima bifurcação e sendo
+\begin{equation*}
+    \delta_n = \frac{F_{n-1} - F_{n-2}}{F_n - F_{n-1}},
+\end{equation*}
+obtemos uma estimativa de \(\delta \approx 4.66667\), como mostrado na \cref{tab:feigenbaum}. Para melhorar a estimativa poderíamos repetir o processo, diminuindo cada vez mais o passo e restringindo os valores de \(F\).
+
+\subsubsection{Mapa de Poincaré}
+O mapa de Poincaré foi feito com a rotina abaixo, executada a seguir da rotina do diagrama de bifurcação. Nela, executamos a função \verb|poincaré| apenas uma vez, mas com o estado estacionário sendo evoluído por 20000 períodos.
+\inputminted[firstline=175,lastline=178]{c}{src/main.c}
+
+O resultado é apresentado na \cref{fig:ex2e}.
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.5\textwidth]{src/2e.png}
@@ -135,7 +159,6 @@ obtemos uma estimativa de \(\delta \approx 4.66667\), como mostrado na \cref{tab
 A rotina principal, cujas seções foram discutidas anteriormente, se encontra a seguir.
 \inputminted[fontsize=\small]{c}{src/main.c}
 
-O programa feito para produzir os gráficos das %\cref{fig:ex1,fig:ex2,fig:ex3} 
-se encontra abaixo.
+O programa feito para produzir os gráficos das \cref{fig:ex1,fig:ex1b,fig:ex2a,fig:ex2b,fig:ex2c,fig:ex2d,fig:ex2d2,fig:ex2e} se encontra abaixo.
 \inputminted[fontsize=\small]{python}{src/plot.py}
 \end{document}
