@@ -93,6 +93,12 @@ Para o sistema com força externa, fixamos \(2\gamma = 0.25\) e \(\omega = 0.95,
     \label{fig:ex2c}
 \end{figure}
 
+\subsection{Atratores}
+
+Para o sistema livre, mostrado na \cref{fig:ex2a}, temos órbitas fechadas em torno dos pontos de equilíbrio estável \(x = \pm1,\) portanto os atratores são os ciclos limites. Para o sistema amortecido, conforme \cref{fig:ex2b}, o sistema não é mais conservativo e as trajetórias tendem aos pontos fixos \((x = \pm1, v = 0)\) do sistema.
+
+O sistema forçado, apresentado na \cref{fig:ex2c}, apresenta atratores tanto de trajetórias periódicas quanto caóticas, a depender da amplitude da força externa. Para \(F\) pequeno e grande, como para \(F = 0.19\) e \(F = 0.6\) temos trajetórias periódicas, mas para valores intermediários, notavelmente \(F = 0.240,\) temos o comportamento caótico.
+
 \subsection{Seções de Poincaré}
 Para as seções de Poincaré utilizadas nos diagramas de bifurcação e no mapa de Poincaré, foi criada a subrotina \verb|poincaré|, disponível abaixo. Esta função evolui o sistema por \verb|t_periods| períodos, que deve corresponder ao transiente, e depois evolui o sistema em estado estacionário por \verb|s_periods|, escrevendo os resultados em um arquivo a cada período.
 \inputminted[firstline=90,lastline=109]{c}{src/main.c}
